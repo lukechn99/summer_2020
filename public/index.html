@@ -25,7 +25,33 @@
 <body>
     <div class='row'>
         <div class="canvasframe">
-            <label>Content goes here</label>
+            <label>Event Log</label>
+            <canvas height='500px' width='800px' style="border: 1pt solid black;"></canvas>
+            <div class="day-options">
+                <form>
+                    <label>Day</label><br>
+                    <input id="day-leave" type="button" value="Leave"></input>
+                    <input id="day-stay" type="button" value="Stay"></input>
+                    <br>
+                    <input id="day-proceed" type="button" value="Proceed to Night"></input>
+                </form>
+            </div>
+            <br>
+            <div class="night-options">
+                <form>
+                    <label>Night</label><br>
+                    <input id="night-stay_awake" type="button" value="Stay Awake"></input>
+                    <br>
+                    <input id="night-stab" type="button" value="Stab"></input>
+                    <input id="night-tape" type="button" value="Tape"></input>
+                    <select id="player-select" name="number">
+                        <option value='2'>Alice</option>
+                        <option value='3'>Bob</option>
+                        <option value='4'>Charlie</option>
+                        <option value='5'>Dave</option>
+                      </select>
+                </form>
+            </div>
         </div>
         <div class="chatframe">
             <form>
