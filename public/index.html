@@ -49,10 +49,10 @@
                     <label>or</label>
                     <input id="night-tape" type="button" onclick="button_night('tape')" value="Tape"></input>
                     <select id="player-select" name="number">
-                        <option value='1'>Alice</option>
-                        <option value='2'>Bob</option>
-                        <option value='3'>Charlie</option>
-                        <option value='4'>Dave</option>
+                        <option value='Alice'>Alice</option>
+                        <option value='Bob'>Bob</option>
+                        <option value='Charlie'>Charlie</option>
+                        <option value='Dave'>Dave</option>
                       </select>
                 </form>
             </div>
@@ -128,18 +128,28 @@
         })
 
         const playerselect = document.getElementById('player-select')
+        const eventlog = document.getElementById('eventlog')
 
+        //triggered on clicking "Leave" or "Stay" buttons.
         function button_day(option = 'stay') {
             socket.emit('button-day', option);
         }
 
+        //triggered on clicking "Proceed" button.
         function button_proceed() {
             socket.emit('button-proceed', null);
         }
 
+        //triggered on clicking "Stay Awake", "Stab", or "Tape" buttons.
         function button_night(option) {
             socket.emit('button-night', {option: option, target: playerselect.value});
         }
+
+        //receiving game event message
+        socket.on('game-event', message => {
+            //console.log(message);
+            eventlog.value += message
+        })
 
     </script>
 </body>

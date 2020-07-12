@@ -17,6 +17,11 @@ const io = socket(server);
 const users = {};
 
 //when a socket connects to the server
+//Sockets reference:
+// socket.on(message-type, function()) - receiving data from socket, triggers function().
+// io.sockets.emit(message-type, data) - sending data to all connected sockets.
+// socket.broadcast.emit(message-type, data) - sending data to all connected sockets except the socket which triggered it.
+// socket.emit(message-type, data) - sending data to only the socket which triggered it.
 io.on('connection', socket => {
     
     console.log(`new connection from ${socket.id}`);
@@ -50,14 +55,14 @@ io.on('connection', socket => {
         console.log(`${users[socket.id]} voted to ${option}.`);
         //TO DO: what happens when vote stay or leave.
 
-
+        io.sockets.emit('game-event', `${users[socket.id]} voted to ${option}.`)
     })
 
     socket.on('button-proceed', () => {
         console.log(`${users[socket.id]} wants to proceed to night.`);
         //TO DO: what happens when vote to proceed.
 
-
+        io.sockets.emit('game-event', `${users[socket.id]} wants to proceed to night.`)
     })
 
     //Night Phase
@@ -67,19 +72,20 @@ io.on('connection', socket => {
             console.log(`${users[socket.id]} attempted to stab ${choice.target}.`);
             //TO DO: what happens in stabbing.
 
+            io.sockets.emit('game-event', `${users[socket.id]} attempted to stab ${choice.target}.`)
         }
         if (choice.option === 'tape') {
             console.log(`${users[socket.id]} investigated ${choice.target}.`);
             //TO DO: what happens in taping.
 
+            io.sockets.emit('game-event', `${users[socket.id]} investigated ${choice.target}.`)
         }
         if (choice.option === 'awake') {
             console.log(`${users[socket.id]} is staying awake.`);
             //TO DO: what happens in staying awake.
 
+            io.sockets.emit('game-event', `${users[socket.id]} is staying awake.`)
         }
-
-
     })
 
 
