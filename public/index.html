@@ -89,11 +89,13 @@
         })
 
         //HTML participants box
-        let participantsbox = document.getElementById('participants')
+        const participantsbox = document.getElementById('participants');
+        const playerselect = document.getElementById('player-select');
+        const eventlog = document.getElementById('eventlog');
         
         //socket client programming
         const name = prompt('Enter username: ')
-        socket.emit('new-user', name)
+        socket.emit('new-user', name);
         //console.log(`${name} joined.`)
         chatbox.value += `${name} joined.\n`;
 
@@ -106,29 +108,34 @@
         //receiving a chat-message
         socket.on('chat-message', data => {
             //console.log(`${data.name}: ${data.message}`);
-            chatbox.value += `${data.name}: ${data.message}\n`
+            chatbox.value += `${data.name}: ${data.message}\n`;
         })
 
         //sending a chat-message
         function send_message(message = 'sample message') {
             socket.emit('send-chat-message', message);
             //console.log(`${name}: ${message}`);
-            chatbox.value += `${name}: ${message}\n`
+            chatbox.value += `${name}: ${message}\n`;
         }
 
         //receiving disconnection message
         socket.on('user-disconnected', name => {
             //console.log(`${name} left.`);
-            chatbox.value += `${name} left.\n`
+            chatbox.value += `${name} left.\n`;
         })
 
         //recieving a list of participants
+        //update participansbox and playerselect
         socket.on('participants', participants => {
+            let str = '';
+            for (const participant of participants) {
+                str += `<option>${participant}<option>`;
+            }
+            playerselect.innerHTML = str;
             participantsbox.value = participants.join('\n');
         })
 
-        const playerselect = document.getElementById('player-select')
-        const eventlog = document.getElementById('eventlog')
+        
 
         //triggered on clicking "Leave" or "Stay" buttons.
         function button_day(option = 'stay') {
@@ -148,7 +155,7 @@
         //receiving game event message
         socket.on('game-event', message => {
             //console.log(message);
-            eventlog.value += message
+            eventlog.value += `${message}\n`;
         })
 
     </script>
