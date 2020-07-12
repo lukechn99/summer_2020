@@ -32,22 +32,22 @@
             <div class="day-options">
                 <form>
                     <label>Day</label><br>
-                    <input id="day-leave" type="button" value="Leave"></input>
+                    <input id="day-leave" type="button" onclick="button_day('leave')" value="Leave"></input>
                     <label>or</label>
-                    <input id="day-stay" type="button" value="Stay"></input>
+                    <input id="day-stay" type="button" onclick="button_day('stay')" value="Stay"></input>
                     <br>
-                    <input id="day-proceed" type="button" value="Proceed to Night"></input>
+                    <input id="day-proceed" type="button" onclick="button_proceed()" value="Proceed to Night"></input>
                 </form>
             </div>
             <br>
             <div class="night-options">
                 <form>
                     <label>Night</label><br>
-                    <input id="night-stay_awake" type="button" value="Stay Awake"></input>
+                    <input id="night-stay_awake" type="button" onclick="button_night('awake')" value="Stay Awake"></input>
                     <br>
-                    <input id="night-stab" type="button" value="Stab"></input>
+                    <input id="night-stab" type="button" onclick="button_night('stab')" value="Stab"></input>
                     <label>or</label>
-                    <input id="night-tape" type="button" value="Tape"></input>
+                    <input id="night-tape" type="button" onclick="button_night('tape')" value="Tape"></input>
                     <select id="player-select" name="number">
                         <option value='1'>Alice</option>
                         <option value='2'>Bob</option>
@@ -94,31 +94,31 @@
         //socket client programming
         const name = prompt('Enter username: ')
         socket.emit('new-user', name)
-        console.log(`${name} joined.`)
+        //console.log(`${name} joined.`)
         chatbox.value += `${name} joined.\n`;
 
         //receiving new connection message
         socket.on('user-connected', name => {
-            console.log(`${name} joined.`);
+            //console.log(`${name} joined.`);
             chatbox.value += `${name} joined.\n`;
         })
 
         //receiving a chat-message
         socket.on('chat-message', data => {
-            console.log(`${data.name}: ${data.message}`);
+            //console.log(`${data.name}: ${data.message}`);
             chatbox.value += `${data.name}: ${data.message}\n`
         })
 
         //sending a chat-message
         function send_message(message = 'sample message') {
             socket.emit('send-chat-message', message);
-            console.log(`${name}: ${message}`);
+            //console.log(`${name}: ${message}`);
             chatbox.value += `${name}: ${message}\n`
         }
 
         //receiving disconnection message
         socket.on('user-disconnected', name => {
-            console.log(`${name} left.`);
+            //console.log(`${name} left.`);
             chatbox.value += `${name} left.\n`
         })
 
@@ -126,6 +126,21 @@
         socket.on('participants', participants => {
             participantsbox.value = participants.join('\n');
         })
+
+        const playerselect = document.getElementById('player-select')
+
+        function button_day(option = 'stay') {
+            socket.emit('button-day', option);
+        }
+
+        function button_proceed() {
+            socket.emit('button-day', null);
+        }
+
+        function button_night(option) {
+            socket.emit('button-night', {option: option, target: playerselect.value});
+        }
+
     </script>
 </body>
 </html>

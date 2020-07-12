@@ -44,5 +44,43 @@ io.on('connection', socket => {
     })
 
     //when server receives command
-    
+    //Day Phase
+    //option = 'stay' or 'leave'
+    socket.on('button-day', option => {
+        console.log(`${users[socket.id]} voted to ${option}.`);
+        //TO DO: what happens when vote stay or leave.
+
+
+    })
+
+    socket.on('button-proceed', () => {
+        console.log(`${users[socket.id]} wants to proceed to night.`);
+        //TO DO: what happens when vote to proceed.
+
+
+    })
+
+    //Night Phase
+    //choice = {option: 'awake' or 'stab' or 'tape', target: 'name' }
+    socket.on('button-night', choice => {
+        if (choice.option === 'stab') {
+            console.log(`${users[socket.id]} attempted to stab ${choice.target}.`);
+            //TO DO: what happens in stabbing.
+
+        }
+        if (choice.option === 'tape') {
+            console.log(`${users[socket.id]} investigated ${choice.target}.`);
+            //TO DO: what happens in taping.
+
+        }
+        if (choice.option === 'awake') {
+            console.log(`${users[socket.id]} is staying awake.`);
+            //TO DO: what happens in staying awake.
+
+        }
+
+
+    })
+
+
 })
