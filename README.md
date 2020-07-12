@@ -5,6 +5,7 @@ https://docs.google.com/document/d/1wmxIVC2qE-FJ6cfsiY5HSu9gsvDUF_meoxXCuo7gLz0/
 ## TODO:  
 - ~Assign S3 full access for code~
 - ~create s3 bucket~
+- 
 
 ## Notes:  
 - Whenever website code is updated, it needs to be uploaded to S3 -> /var/www/html [source](https://www.youtube.com/watch?v=dhRwKPrum44)
