@@ -48,12 +48,7 @@
                     <input id="night-stab" type="button" onclick="button_night('stab')" value="Stab"></input>
                     <label>or</label>
                     <input id="night-tape" type="button" onclick="button_night('tape')" value="Tape"></input>
-                    <select id="player-select" name="number">
-                        <option value='Alice'>Alice</option>
-                        <option value='Bob'>Bob</option>
-                        <option value='Charlie'>Charlie</option>
-                        <option value='Dave'>Dave</option>
-                      </select>
+                    <select id="player-select"></select>
                 </form>
             </div>
         </div>
@@ -129,7 +124,7 @@
         socket.on('participants', participants => {
             let str = '';
             for (const participant of participants) {
-                str += `<option>${participant}<option>`;
+                str += `<option>${participant}</option>`;
             }
             playerselect.innerHTML = str;
             participantsbox.value = participants.join('\n');
