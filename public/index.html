@@ -26,11 +26,14 @@
     <div class='row'>
         <div class="canvasframe">
             <label>Event Log</label>
-            <canvas height='500px' width='800px' style="border: 1pt solid black;"></canvas>
+            <br>
+            <textarea id="eventlog" rows="30" cols="150" style="border: 1pt solid black;" disabled></textarea>
+            <br>
             <div class="day-options">
                 <form>
                     <label>Day</label><br>
                     <input id="day-leave" type="button" value="Leave"></input>
+                    <label>or</label>
                     <input id="day-stay" type="button" value="Stay"></input>
                     <br>
                     <input id="day-proceed" type="button" value="Proceed to Night"></input>
@@ -43,12 +46,13 @@
                     <input id="night-stay_awake" type="button" value="Stay Awake"></input>
                     <br>
                     <input id="night-stab" type="button" value="Stab"></input>
+                    <label>or</label>
                     <input id="night-tape" type="button" value="Tape"></input>
                     <select id="player-select" name="number">
-                        <option value='2'>Alice</option>
-                        <option value='3'>Bob</option>
-                        <option value='4'>Charlie</option>
-                        <option value='5'>Dave</option>
+                        <option value='1'>Alice</option>
+                        <option value='2'>Bob</option>
+                        <option value='3'>Charlie</option>
+                        <option value='4'>Dave</option>
                       </select>
                 </form>
             </div>
