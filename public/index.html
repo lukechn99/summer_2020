@@ -7,19 +7,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>summer 2020</title>
     <style>
-      .canvasframe {
-        float: left;
-        width: 620px;
-      }
-      .chatframe {
-        float: right;
-        width: 350px;
-      }
-      .row:after {
-        content: "";
-        display: table;
-        clear: both;
-      }
+        .canvasframe {
+            float: left;
+            width: 600px;
+            margin: 5px;
+            padding: 5px;
+        }
+
+        #eventlog {
+            width: 600px;
+            height: 600px;
+            border: 1pt solid black;
+        }
+
+        .chatframe {
+            float: left;
+            width: 320px;
+            margin: 5px;
+            padding: 5px;
+        }
+
+        #participants {
+            width: 310px;
+            height: 150px;
+        }
+
+        #chatbox {
+            width: 310px;
+            height: 450px;
+        }
+
+        #text {
+            width: 250px;
+        }
+
+        #returnbutton {
+            width: 55px;
+        }
+
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
     </style>
 </head>
 <body>
@@ -27,7 +57,7 @@
         <div class="canvasframe">
             <label>Event Log</label>
             <br>
-            <textarea id="eventlog" rows="30" cols="150" style="border: 1pt solid black;" disabled></textarea>
+            <textarea id="eventlog" disabled></textarea>
             <br>
             <div class="day-options">
                 <form>
@@ -54,10 +84,10 @@
         <div class="chatframe">
             <form>
                 <label>Participants</label><br>
-                <textarea id="participants" rows="10" cols="50" disabled></textarea><br>
+                <textarea id="participants" disabled></textarea><br>
                 <label>Chat</label><br>
-                <textarea id="chatbox" rows="31" cols="50" disabled></textarea><br>
-                <input type="text" id="text" size="43"></input>
+                <textarea id="chatbox" disabled></textarea><br>
+                <input type="text" id="text"></input>
                 <input id="returnbutton" type="button" value="Return"></input><br>
             </form>
         </div>
