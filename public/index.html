@@ -39,7 +39,6 @@
                     <input id="day-proceed" type="button" onclick="button_proceed()" value="Proceed to Night"></input>
                 </form>
             </div>
-            <br>
             <div class="night-options">
                 <form>
                     <label>Night</label><br>
@@ -153,6 +152,25 @@
             eventlog.value += `${message}\n`;
         })
 
+        //hiding and showing day / night options
+        //true = show
+        //false = hide
+        //toggle_visible(true, false) for day (default)
+        //toggle_visible(false, true) for night
+        //toggle_visible(true, true) to see both
+
+        function toggle_visible(day = true, night = false) {
+            const day_style = day ? "block" : "none"
+            const day_elements = document.getElementsByClassName('day-options');
+            for (let i = 0; i < day_elements.length; i++) {
+                day_elements[i].style.display = day_style;
+            }
+            const night_style = night ? "block" : "none"
+            const night_elements = document.getElementsByClassName('night-options');
+            for (let i = 0; i < night_elements.length; i++) {
+                night_elements[i].style.display = night_style;
+            }
+        }
     </script>
 </body>
 </html>
