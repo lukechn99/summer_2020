@@ -66,9 +66,9 @@
     <script>
         const socket = io(`http://18.217.107.58:3000`)
         //HTML chatbox and textbox and return button
-        let chatbox = document.getElementById('chatbox');
-        let text = document.getElementById('text');
-        let returnbutton = document.getElementById('returnbutton');
+        const chatbox = document.getElementById('chatbox');
+        const text = document.getElementById('text');
+        const returnbutton = document.getElementById('returnbutton');
         returnbutton.addEventListener('click', event => {
             send_message(text.value);
             text.value = '';
