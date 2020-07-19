@@ -80,55 +80,54 @@ function startDay(thisGame){
 
     }
 }
-
-function GameClient(participantNames){
-    this.daysPassed = 0;
-    this.participants;
-    this.votesTotal;
-    
-    //choosing who the ghosts are
-    var randomElement = Math.floor(Math.random() * participantNames.length);
-    var randomElement2 = Math.floor(Math.random() * participantNames.length);
-    while(randomElement == randomElement2){
-        randomElement2 = Math.floor(Math.random() * participantNames.length)
-    }
-
-    //adding participants while saying which one's are ghosts
-    for(var i = 0; i < participantNames.length; i++){
-        var playerIsGhost = false;
-        if(i == randomElement || i == randomElement2){
-            playerIsGhost = true;
+class GameClient {
+    constructor(participantNames) {
+        this.daysPassed = 0;
+        this.participants = [];
+        this.votesTotal;
+        console.log(participantNames);
+        //choosing who the ghosts are
+        var randomElement = Math.floor(Math.random() * participantNames.length);
+        var randomElement2 = Math.floor(Math.random() * participantNames.length);
+        while(randomElement == randomElement2){
+            randomElement2 = Math.floor(Math.random() * participantNames.length)
         }
-        var newPlayer = new Player(participantNames[i], playerIsGhost);
-        participants.push(newPlayer);
+    
+        //adding participants while saying which one's are ghosts
+        for(var i = 0; i < participantNames.length; i++){
+            var playerIsGhost = false;
+            if(i == randomElement || i == randomElement2){
+                playerIsGhost = true;
+            }
+            var newPlayer = new Player(participantNames[i], playerIsGhost);
+            this.participants.push(newPlayer);
+        }
+        console.log(this.participants);
+    }
+    //removes players from list of participants
+    killPlayer(playerName) {
+        for(var i = 0; i < participants.length; i++){
+            if(participants[i].name == playerName){
+                console.log(playerName + ' has been killed');
+                io.sockets.emit('game-event', playerName + ' has been killed');
+        
+                participants.splice(i,1);
+        
+            }
+        }
+    }
+    //checks whether ghosts are present and will tell player whether they won or not, this function is not finished.
+    endGame() {
+        var ghostsPresent = 0;
+
+        for(var i = 0; i < participants.length; i++){
+            if(participants[i].isGhost == true){
+                ghostsPresent++;
+            }
+        }
+        console.log(ghostsPresent)
     }
 }
-
-//removes players from list of participants
-GameClient.prototype.killPlayer = function(playerName) {
-  for(var i = 0; i < participants.length; i++){
-    if(participants[i].name == playerName){
-        console.log(playerName + ' has been killed');
-        io.sockets.emit('game-event', playerName + ' has been killed');
-
-        participants.splice(i,1);
-
-    }
-  }
-};
-
-//checks whether ghosts are present and will tell player whether they won or not, this function is not finished.
-GameClient.prototype.endGame = function(){
-    var ghostsPresent = 0;
-
-    for(var i = 0; i < participants.length; i++){
-        if(participants[i].isGhost == true){
-            ghostsPresent++;
-        }
-    }
-};
-
-
 
 
 //web application with express
@@ -202,7 +201,7 @@ io.on('connection', socket => {
             unanimous = false;
         }
         if(gameInstance.votesTotal >= gameInstance.participants.lenth){
-            if(unanimous = false){
+            if(unanimous == true){
                 gameInstance.endGame();
             }
             else{
