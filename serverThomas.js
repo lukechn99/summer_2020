@@ -99,7 +99,7 @@ function GameClient(participantNames){
         if(i == randomElement || i == randomElement2){
             playerIsGhost = true;
         }
-        var newPlayer = new Player(participantNames(i),playerIsGhost);
+        var newPlayer = new Player(participantNames[i], playerIsGhost);
         participants.push(newPlayer);
     }
 }
