@@ -146,7 +146,7 @@ const io = socket(server);
 //object to track clients
 const users = {};
 
-var newGame = null;
+var gameInstance = null;
 
 //when a socket connects to the server
 //Sockets reference:
@@ -159,7 +159,7 @@ io.on('connection', socket => {
 	socket.on('start-game', () => {
 		console.log("Game Start");
 		socket.broadcast.emit('game-event', "Game Start");
-		newGame = new GameClient(Object.values(users));
+		gameInstance = new GameClient(Object.values(users));
 	})
     
     console.log(`new connection from ${socket.id}`);
