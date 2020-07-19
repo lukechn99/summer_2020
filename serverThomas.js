@@ -146,6 +146,8 @@ const io = socket(server);
 //object to track clients
 const users = {};
 
+var newGame = null;
+
 //when a socket connects to the server
 //Sockets reference:
 // socket.on(message-type, function()) - receiving data from socket, triggers function().
@@ -153,6 +155,12 @@ const users = {};
 // socket.broadcast.emit(message-type, data) - sending data to all connected sockets except the socket which triggered it.
 // socket.emit(message-type, data) - sending data to only the socket which triggered it.
 io.on('connection', socket => {
+
+	socket.on('start-game', () => {
+		console.log("Game Start");
+		socket.broadcast.emit('game-event', "Game Start");
+		newGame = new GameClient(Object.values(users));
+	}
     
     console.log(`new connection from ${socket.id}`);
     
