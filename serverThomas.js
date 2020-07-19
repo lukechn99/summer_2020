@@ -87,10 +87,10 @@ function GameClient(participantNames){
     this.votesTotal;
     
     //choosing who the ghosts are
-    var randomElement = Math.floor(Math.random() * array.length);
-    var randomElement2 = Math.floor(Math.random() * array.length);
+    var randomElement = Math.floor(Math.random() * participantNames.length);
+    var randomElement2 = Math.floor(Math.random() * participantNames.length);
     while(randomElement == randomElement2){
-        randomElement2 = Math.floor(Math.random() * array.length)
+        randomElement2 = Math.floor(Math.random() * participantNames.length)
     }
 
     //adding participants while saying which one's are ghosts
