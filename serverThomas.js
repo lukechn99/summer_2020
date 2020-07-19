@@ -160,7 +160,7 @@ io.on('connection', socket => {
 		console.log("Game Start");
 		socket.broadcast.emit('game-event', "Game Start");
 		newGame = new GameClient(Object.values(users));
-	}
+	})
     
     console.log(`new connection from ${socket.id}`);
     
