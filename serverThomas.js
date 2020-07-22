@@ -155,13 +155,8 @@ var gameInstance = null;
 // socket.emit(message-type, data) - sending data to only the socket which triggered it.
 io.on('connection', socket => {
 
-	socket.on('start-game', () => {
-		console.log("Game Start");
-		socket.broadcast.emit('game-event', "Game Start");
-		gameInstance = new GameClient(Object.values(users));
-	})
-    
     console.log(`new connection from ${socket.id}`);
+    socket.emit('get-name', null)
     
     //when username is entered, track name in users, send user-connected message to all clients, update participants box
     socket.on('new-user', name => {
@@ -185,6 +180,13 @@ io.on('connection', socket => {
         io.sockets.emit('participants', Object.values(users));
     })
 
+    //start game button
+    socket.on('start-game', () => {
+		console.log("Game Start");
+		socket.broadcast.emit('game-event', "Game Start");
+		gameInstance = new GameClient(Object.values(users));
+    })
+    
     //when server receives command
     //Day Phase
     //option = 'stay' or 'leave'

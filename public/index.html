@@ -121,10 +121,16 @@
         const eventlog = document.getElementById('eventlog');
         
         //socket client programming
-        const name = prompt('Enter username: ')
-        socket.emit('new-user', name);
-        //console.log(`${name} joined.`)
-        chatbox.value += `${name} joined.\n`;
+        let name;
+        function get_name() {
+            name = prompt('Enter username: ')
+            socket.emit('new-user', name);
+            //console.log(`${name} joined.`)
+            chatbox.value += `${name} joined.\n`;
+        }
+        socket.on('get-name', () => {
+            get_name()
+        })
 
         //receiving new connection message
         socket.on('user-connected', name => {
