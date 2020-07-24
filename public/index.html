@@ -159,13 +159,13 @@
 
         //recieving a list of participants
         //update participansbox and playerselect
-        socket.on('participants', participants => {
+        socket.on('participants', users => {
             let str = '';
-            for (const participant of participants) {
-                str += `<option>${participant}</option>`;
+            for (const id in users) {
+                str += `<option value='${id}'>${users[id]}</option>`;
             }
             playerselect.innerHTML = str;
-            participantsbox.value = participants.join('\n');
+            participantsbox.value = Object.values(users).join('\n');
         })
 
         
@@ -182,7 +182,7 @@
 
         //triggered on clicking "Stay Awake", "Stab", or "Tape" buttons.
         function button_night(option) {
-            socket.emit('button-night', {option: option, target: playerselect.value});
+            socket.emit('button-night', {option: option, targetid: playerselect.value});
         }
 
         //receiving game event message

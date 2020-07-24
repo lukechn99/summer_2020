@@ -1,15 +1,17 @@
 //game code goes here
 
 //Player object, keeps track of stats that change throughout the day
-function Player(name, isGhost){
-    this.name = name;
-    this.isGhost = isGhost;
-    this.isDead = false;
-    this.timesKnifed = 0;
-    this.tiredDays = 0;
-    this.leavesRoom = false;
-    this.investigating = null;
-    this.murderers = null;
+class Player {
+    constructor(name, isGhost) {
+        this.name = name;
+        this.isGhost = isGhost;
+        this.isDead = false;
+        this.timesKnifed = 0;
+        this.tiredDays = 0;
+        this.leavesRoom = false;
+        this.investigating = null;
+        this.murderers = null;
+    }
 }
 
 //increases the counter of stabs on victim, and shows the murderer left the room. If the victim is awake, they see the murderer
@@ -89,14 +91,14 @@ class GameClient {
         //choosing who the ghosts are
         var randomElement = Math.floor(Math.random() * participantNames.length);
         var randomElement2 = Math.floor(Math.random() * participantNames.length);
-        while(randomElement == randomElement2){
-            randomElement2 = Math.floor(Math.random() * participantNames.length)
+        while (randomElement == randomElement2) {
+            randomElement2 = Math.floor(Math.random() * participantNames.length);
         }
     
         //adding participants while saying which one's are ghosts
-        for(var i = 0; i < participantNames.length; i++){
+        for (var i = 0; i < participantNames.length; i++) {
             var playerIsGhost = false;
-            if(i == randomElement || i == randomElement2){
+            if (i == randomElement || i == randomElement2) {
                 playerIsGhost = true;
             }
             var newPlayer = new Player(participantNames[i], playerIsGhost);
@@ -106,8 +108,8 @@ class GameClient {
     }
     //removes players from list of participants
     killPlayer(playerName) {
-        for(var i = 0; i < participants.length; i++){
-            if(participants[i].name == playerName){
+        for (var i = 0; i < participants.length; i++) {
+            if (participants[i].name == playerName) {
                 console.log(playerName + ' has been killed');
                 io.sockets.emit('game-event', playerName + ' has been killed');
         
@@ -120,8 +122,8 @@ class GameClient {
     endGame() {
         var ghostsPresent = 0;
 
-        for(var i = 0; i < participants.length; i++){
-            if(participants[i].isGhost == true){
+        for (var i = 0; i < participants.length; i++) {
+            if (participants[i].isGhost == true) {
                 ghostsPresent++;
             }
         }
@@ -145,7 +147,7 @@ const io = socket(server);
 //object to track clients
 const users = {};
 
-var gameInstance = null;
+let gameInstance;
 
 //when a socket connects to the server
 //Sockets reference:
@@ -163,7 +165,7 @@ io.on('connection', socket => {
         users[socket.id] = name;
         console.log(`${name} joined.`);
         socket.broadcast.emit('user-connected', name);
-        io.sockets.emit('participants', Object.values(users));
+        io.sockets.emit('participants', users);
     })
     
     //when server receives message, send chat message to all clients
@@ -177,7 +179,7 @@ io.on('connection', socket => {
         socket.broadcast.emit('user-disconnected', users[socket.id]);
         console.log(`${users[socket.id]} left.`);
         delete users[socket.id];
-        io.sockets.emit('participants', Object.values(users));
+        io.sockets.emit('participants', users);
     })
 
     //start game button
@@ -202,7 +204,7 @@ io.on('connection', socket => {
         if(option == "stay"){
             unanimous = false;
         }
-        if(gameInstance.votesTotal >= gameInstance.participants.lenth){
+        if(gameInstance.votesTotal >= gameInstance.participants.length){
             if(unanimous == true){
                 gameInstance.endGame();
             }
@@ -238,35 +240,35 @@ io.on('connection', socket => {
     })
 
     //Night Phase
-    //choice = {option: 'awake' or 'stab' or 'tape', target: 'name' }
+    //choice = {option: 'awake' or 'stab' or 'tape', targetid: 'name' }
     socket.on('button-night', choice => {
 
         //keep track of whether everyone made a choice
         gameInstance.votesTotal++;
-        var tempindexActor = gameInstance.participants.find(users[socket.id]);
+        var tempIndexActor = gameInstance.participants.findIndex(player => player.name === users[socket.id]);
 
 
         if (choice.option === 'stab') {
-            console.log(`${users[socket.id]} attempted to stab ${choice.target}.`);
+            console.log(`${users[socket.id]} attempted to stab ${users[choice.targetid]}.`);
             //TO DO: what happens in stabbing.
 
-            var tempindexVictim = gameInstance.participants.find(users[choice.target]);
-
+            var tempindexVictim = gameInstance.participants.findIndex(player => player.name === users[choice.targetid]);
+            console.log(gameInstance.participants[tempIndexActor], gameInstance.participants[tempindexVictim])
             knife(gameInstance.participants[tempIndexActor], gameInstance.participants[tempindexVictim]);
 
 
-            io.sockets.emit('game-event', `${users[socket.id]} attempted to stab ${choice.target}.`);
+            io.sockets.emit('game-event', `${users[socket.id]} attempted to stab ${users[choice.targetid]}.`);
         }
         if (choice.option === 'tape') {
-            console.log(`${users[socket.id]} investigated ${choice.target}.`);
+            console.log(`${users[socket.id]} investigated ${users[choice.targetid]}.`);
             //TO DO: what happens in taping.
 
-            var tempindexSuspect =  gameInstance.participants.find(users[choice.target]);
-            suspect(gameInstance.participants[tempIndexActor], gameInstance.participants[tempindexSuspect]);
+            var tempindexSuspect =  gameInstance.participants.findIndex(player => player.name === users[choice.targetid]);
+            tape(gameInstance.participants[tempIndexActor], gameInstance.participants[tempindexSuspect]);
 
 
 
-            io.sockets.emit('game-event', `${users[socket.id]} investigated ${choice.target}.`);
+            io.sockets.emit('game-event', `${users[socket.id]} investigated ${users[choice.targetid]}.`);
         }
         if (choice.option === 'awake') {
             
