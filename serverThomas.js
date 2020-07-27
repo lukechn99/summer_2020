@@ -221,6 +221,7 @@ io.on('connection', socket => {
 	})
     
     console.log(`new connection from ${socket.id}`);
+    socket.emit('get-name', null)
     
     //when username is entered, track name in users, send user-connected message to all clients, update participants box
     socket.on('new-user', name => {
