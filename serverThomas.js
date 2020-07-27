@@ -265,8 +265,8 @@ io.on('connection', socket => {
                 gameInstance.endGame();
             }
             else{
-                console.log(`Vote failed; when ready, procceed to night.`);
-                io.sockets.emit('game-event', `Vote failed; when ready, procceed to night.`);
+                console.log(`Vote failed; when ready, proceed to night.`);
+                io.sockets.emit('game-event', `Vote failed; when ready, proceed to night.`);
             }
         }
 
@@ -301,16 +301,16 @@ io.on('connection', socket => {
 
         //keep track of whether everyone made a choice
         gameInstance.votesTotal++;
-        var tempindexActor = gameInstance.participants.findIndex(player => player.usertag === socket.id);
+        var tempIndexActor = gameInstance.participants.findIndex(player => player.usertag === socket.id);
 
 
         if (choice.option === 'stab') {
             console.log(`${users[socket.id]} attempted to stab ${choice.target}.`);
             //TO DO: what happens in stabbing.
 
-            var tempindexVictim = gameInstance.participants.findIndex(player => player.usertag === choice.socket.id);
+            var tempIndexVictim = gameInstance.participants.findIndex(player => player.usertag === choice.socket.id);
 
-            gameInstance.participants[tempIndexActor].knife(gameInstance.participants[tempindexVictim]);
+            gameInstance.participants[tempIndexActor].knife(gameInstance.participants[tempIndexVictim]);
 
 
             io.sockets.emit('game-event', `${users[socket.id]} attempted to stab ${choice.target}.`);
@@ -319,8 +319,8 @@ io.on('connection', socket => {
             console.log(`${users[socket.id]} investigated ${choice.target}.`);
             //TO DO: what happens in taping.
 
-            var tempindexSuspect =  gameInstance.participants.findIndex(player => player.usertag === choice.socket.id);
-            gameInstance.participants[tempIndexActor].suspect(gameInstance.participants[tempindexSuspect]);
+            var tempIndexSuspect =  gameInstance.participants.findIndex(player => player.usertag === choice.socket.id);
+            gameInstance.participants[tempIndexActor].suspect(gameInstance.participants[tempIndexSuspect]);
 
 
 
