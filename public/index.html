@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>summer 2020</title>
     <style>
+        body {
+            transition: ease background-color 2s
+        }
         .canvasframe {
             float: left;
             width: 600px;
@@ -59,28 +62,35 @@
             <br>
             <textarea id="eventlog" disabled></textarea>
             <br>
+            <div class='phase-0'>
             <input id="start" type="button" value="Start" onclick="socket.emit('start-game', null);"></input>
-            <br>
-            <div class="day-options">
-                <form>
-                    <label>Day</label><br>
-                    <input id="day-leave" type="button" onclick="button_day('leave')" value="Leave"></input>
-                    <label>or</label>
-                    <input id="day-stay" type="button" onclick="button_day('stay')" value="Stay"></input>
-                    <br>
-                    <input id="day-proceed" type="button" onclick="button_proceed()" value="Proceed to Night"></input>
-                </form>
             </div>
-            <div class="night-options">
-                <form>
-                    <label>Night</label><br>
-                    <input id="night-stay_awake" type="button" onclick="button_night('awake')" value="Stay Awake"></input>
-                    <br>
-                    <input id="night-stab" type="button" onclick="button_night('stab')" value="Stab"></input>
-                    <label>or</label>
-                    <input id="night-tape" type="button" onclick="button_night('tape')" value="Tape"></input>
-                    <select id="player-select"></select>
-                </form>
+            <div class="phase-1">
+                <label>Day</label><br>
+                <input id="day-leave" type="button" onclick="button_day('leave')" value="Leave"></input>
+                <label>or</label>
+                <input id="day-stay" type="button" onclick="button_day('stay')" value="Stay"></input>
+            </div>
+            <div class='phase-2'>
+                <label>Awaiting other players' decisions ...</label>
+            </div>
+            <div class="phase-3">
+                <input id="day-proceed" type="button" onclick="button_proceed()" value="Proceed to Night"></input>
+            </div>
+            <div class='phase-4'>
+                <label>Awaiting other players' decisions ...</label>
+            </div>
+            <div class="phase-5">
+                <label>Night</label><br>
+                <input id="night-stay_awake" type="button" onclick="button_night('awake')" value="Stay Awake"></input>
+                <br>
+                <input id="night-stab" type="button" onclick="button_night('stab')" value="Stab"></input>
+                <label>or</label>
+                <input id="night-tape" type="button" onclick="button_night('tape')" value="Tape"></input>
+                <select id="player-select"></select>
+            </div>
+            <div class='phase-6'>
+                <label>Awaiting other players' decisions ...</label>
             </div>
         </div>
         <div class="chatframe">
@@ -121,10 +131,16 @@
         const eventlog = document.getElementById('eventlog');
         
         //socket client programming
-        const name = prompt('Enter username: ')
-        socket.emit('new-user', name);
-        //console.log(`${name} joined.`)
-        chatbox.value += `${name} joined.\n`;
+        let name;
+        function get_name() {
+            name = prompt('Enter username: ')
+            socket.emit('new-user', name);
+            //console.log(`${name} joined.`)
+            chatbox.value += `${name} joined.\n`;
+        }
+        socket.on('get-name', () => {
+            get_name()
+        })
 
         //receiving new connection message
         socket.on('user-connected', name => {
@@ -153,13 +169,13 @@
 
         //recieving a list of participants
         //update participansbox and playerselect
-        socket.on('participants', participants => {
+        socket.on('participants', users => {
             let str = '';
-            for (const participant of participants) {
-                str += `<option>${participant}</option>`;
+            for (const id in users) {
+                str += `<option value='${id}'>${users[id]}</option>`;
             }
             playerselect.innerHTML = str;
-            participantsbox.value = participants.join('\n');
+            participantsbox.value = Object.values(users).join('\n');
         })
 
         
@@ -176,7 +192,7 @@
 
         //triggered on clicking "Stay Awake", "Stab", or "Tape" buttons.
         function button_night(option) {
-            socket.emit('button-night', {option: option, target: playerselect.value});
+            socket.emit('button-night', {option: option, targetid: playerselect.value});
         }
 
         //receiving game event message
@@ -192,19 +208,20 @@
         //toggle_visible(false, true) for night
         //toggle_visible(true, true) to see both
 
-        function toggle_visible(day = true, night = false) {
-            const day_style = day ? "block" : "none"
-            const day_elements = document.getElementsByClassName('day-options');
-            for (let i = 0; i < day_elements.length; i++) {
-                day_elements[i].style.display = day_style;
+        function toggle_visible(phase = 0, debug = false, spectator = false) {
+            for (let i = 0; i < 7; i++) {
+                let phase_style = (phase === i || debug && !spectator) ? "block" : "none";
+                let phase_elements = document.getElementsByClassName(`phase-${i}`);
+                for (const element of phase_elements) {
+                    element.style.display = phase_style;
+                }
             }
-            const night_style = night ? "block" : "none"
-            const night_elements = document.getElementsByClassName('night-options');
-            for (let i = 0; i < night_elements.length; i++) {
-                night_elements[i].style.display = night_style;
-            }
-            document.body.style.backgroundColor = day ? 'white': 'black';
-            document.body.style.color = day ? 'black': 'white';
+            const color_arg = 128 * (1 - Math.cos(Math.PI * phase / 7))
+            const red = Math.floor(175 * Math.exp(0 - ((color_arg - 80) / 100) ** 2));
+            const green = Math.floor(200 * Math.exp(0 - ((color_arg - 30) / 100) ** 2));
+            const blue = Math.floor(230 * Math.exp(0 - ((color_arg) / 100) ** 2));
+            document.body.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
+            document.body.style.color = red + green + blue > 300 ? 'black': 'white';
         }
     </script>
 </body>
