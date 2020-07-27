@@ -63,30 +63,30 @@
             <textarea id="eventlog" disabled></textarea>
             <br>
             <div class='phase-0'>
-            <input id="start" type="button" value="Start" onclick="socket.emit('start-game', null);"></input>
+            <input id="start" type="button" value="Start" onclick="socket.emit('start-game', null); toggle_visible(1);"></input>
             </div>
             <div class="phase-1">
                 <label>Day</label><br>
-                <input id="day-leave" type="button" onclick="button_day('leave')" value="Leave"></input>
+                <input id="day-leave" type="button" onclick="button_day('leave'); toggle_visible(2);" value="Leave"></input>
                 <label>or</label>
-                <input id="day-stay" type="button" onclick="button_day('stay')" value="Stay"></input>
+                <input id="day-stay" type="button" onclick="button_day('stay') toggle_visible(2);" value="Stay"></input>
             </div>
             <div class='phase-2'>
                 <label>Awaiting other players' decisions ...</label>
             </div>
             <div class="phase-3">
-                <input id="day-proceed" type="button" onclick="button_proceed()" value="Proceed to Night"></input>
+                <input id="day-proceed" type="button" onclick="button_proceed(); toggle_visible(4);" value="Proceed to Night"></input>
             </div>
             <div class='phase-4'>
                 <label>Awaiting other players' decisions ...</label>
             </div>
             <div class="phase-5">
                 <label>Night</label><br>
-                <input id="night-stay_awake" type="button" onclick="button_night('awake')" value="Stay Awake"></input>
+                <input id="night-stay_awake" type="button" onclick="button_night('awake'); toggle_visible(6);" value="Stay Awake"></input>
                 <br>
-                <input id="night-stab" type="button" onclick="button_night('stab')" value="Stab"></input>
+                <input id="night-stab" type="button" onclick="button_night('stab'); toggle_visible(6);" value="Stab"></input>
                 <label>or</label>
-                <input id="night-tape" type="button" onclick="button_night('tape')" value="Tape"></input>
+                <input id="night-tape" type="button" onclick="button_night('tape'); toggle_visible(6);" value="Tape"></input>
                 <select id="player-select"></select>
             </div>
             <div class='phase-6'>
@@ -201,12 +201,19 @@
             eventlog.value += `${message}\n`;
         })
 
-        //hiding and showing day / night options
-        //true = show
-        //false = hide
-        //toggle_visible(true, false) for day (default)
-        //toggle_visible(false, true) for night
-        //toggle_visible(true, true) to see both
+        //Button Visibility Modes
+        //Phase
+        //0: [Start]
+        //1: [Leave] or [Stay]
+        //2: Awaiting other players' decisions ...
+        //3: [Proceed to Night]
+        //4: Awaiting other players' decisions ...
+        //5: [Stay Awake] | [Tape] or [Stab] {player select}
+        //6: Awaiting other players' decisions ...
+
+        //Override Options
+        //debug - all buttons visible
+        //spectator - no buttons visible
 
         function toggle_visible(phase = 0, debug = false, spectator = false) {
             for (let i = 0; i < 7; i++) {
@@ -223,6 +230,9 @@
             document.body.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
             document.body.style.color = red + green + blue > 300 ? 'black': 'white';
         }
+        socket.on('phase', phase => {
+            toggle_visible(phase)
+        })
     </script>
 </body>
 </html>
