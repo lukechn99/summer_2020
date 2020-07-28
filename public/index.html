@@ -21,6 +21,7 @@
             width: 600px;
             height: 600px;
             border: 1pt solid black;
+            background-color: ghostwhite;
         }
 
         .chatframe {
@@ -67,15 +68,15 @@
             </div>
             <div class="phase-1">
                 <label>Day</label><br>
-                <input id="day-leave" type="button" onclick="button_day('leave'); toggle_visible(2);" value="Leave"></input>
+                <input id="day-leave" type="button" onclick="button_day('leave');" value="Leave"></input>
                 <label>or</label>
-                <input id="day-stay" type="button" onclick="button_day('stay'); toggle_visible(2);" value="Stay"></input>
+                <input id="day-stay" type="button" onclick="button_day('stay');" value="Stay"></input>
             </div>
             <div class='phase-2'>
                 <label>Awaiting other players' decisions ...</label>
             </div>
             <div class="phase-3">
-                <input id="day-proceed" type="button" onclick="button_proceed(); toggle_visible(4);" value="Proceed to Night"></input>
+                <input id="day-proceed" type="button" onclick="button_proceed();" value="Proceed to Night"></input>
             </div>
             <div class='phase-4'>
                 <label>Awaiting other players' decisions ...</label>
@@ -84,9 +85,9 @@
                 <label>Night</label><br>
                 <input id="night-stay_awake" type="button" onclick="button_night('awake');" value="Stay Awake"></input>
                 <br>
-                <input id="night-stab" type="button" onclick="button_night('stab'); toggle_visible(6);" value="Stab"></input>
+                <input id="night-stab" type="button" onclick="button_night('stab');" value="Stab"></input>
                 <label>or</label>
-                <input id="night-tape" type="button" onclick="button_night('tape'); toggle_visible(6);" value="Tape"></input>
+                <input id="night-tape" type="button" onclick="button_night('tape');" value="Tape"></input>
                 <select id="player-select"></select>
             </div>
             <div class='phase-6'>
@@ -104,6 +105,7 @@
             </form>
         </div>
     </div>
+    <input type="checkbox" id='debug-mode'></input><label>debug mode</label>
     <script src="/socket.io/socket.io.js"></script>
     <script>
         //const socket = io(`http://18.217.107.58:3000`)
@@ -129,17 +131,15 @@
         const participantsbox = document.getElementById('participants');
         const playerselect = document.getElementById('player-select');
         const eventlog = document.getElementById('eventlog');
-        
+        const debug_mode = document.getElementById('debug-mode');
         //socket client programming
         let name;
-        function get_name() {
+        
+        socket.on('get-name', () => {
             name = prompt('Enter username: ')
             socket.emit('new-user', name);
             //console.log(`${name} joined.`)
             chatbox.value += `${name} joined.\n`;
-        }
-        socket.on('get-name', () => {
-            get_name()
         })
 
         //receiving new connection message
@@ -183,16 +183,21 @@
         //triggered on clicking "Leave" or "Stay" buttons.
         function button_day(option = 'stay') {
             socket.emit('button-day', option);
+            toggle_visible(2, debug_mode.checked);
         }
 
         //triggered on clicking "Proceed" button.
         function button_proceed() {
             socket.emit('button-proceed', null);
+            toggle_visible(4, debug_mode.checked);
         }
 
         //triggered on clicking "Stay Awake", "Stab", or "Tape" buttons.
         function button_night(option) {
             socket.emit('button-night', {option: option, targetid: playerselect.value});
+            if (option !== 'awake') {
+                toggle_visible(4, debug_mode.checked);
+            }
         }
 
         //receiving game event message
@@ -231,7 +236,7 @@
             document.body.style.color = red + green + blue > 300 ? 'black': 'white';
         }
         socket.on('phase', phase => {
-            toggle_visible(phase)
+            toggle_visible(phase, debug_mode.checked)
         })
     </script>
 </body>

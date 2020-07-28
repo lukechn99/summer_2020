@@ -25,25 +25,25 @@ class Player{
     	this.murderers = null;
 	}
 	//increases the counter of stabs on victim, and shows the murderer left the room. If the victim is awake, they see the murderer
-	knife(victim){
+	knife(victim) {
 		victim.timesKnifed++;
 		this.leavesRoom = true;
 		this.tiredDays = 0;
-		victim.murderers = murderer;
+		victim.murderers = this;
 	}
 	//tape lets player investigate, info will be revealed at the start of the next day.
-	tape(suspect){
+	tape(suspect) {
     	this.investigating = suspect;
     	this.tiredDays = 0;
 	}
-	awake(){
-    	if(this.tiredDays >= 3){
+	awake() {
+    	if (this.tiredDays >= 3) {
         	return false;
     	}
-    	else{
+    	else {
         	this.tiredDays++;
         	return true;
-    }
+        }
 }
 
 }
@@ -167,11 +167,10 @@ class GameClient {
     }
     //removes players from list of participants
     killPlayer(playerID) {
-        for (var i = 0; i < participants.length; i++) {
-            if (participants[i].usertag == playerID) {
-                console.log(participants[i].name + ' has been killed');
-                io.sockets.emit('game-event', participants[i].name + ' has been killed');
-        
+        for (var i = 0; i < this.participants.length; i++) {
+            if (this.participants[i].usertag == playerID) {
+                console.log(this.participants[i].name + ' has been killed');
+                io.sockets.emit('game-event', this.participants[i].name + ' has been killed');
                 participants.splice(i,1);
         
             }
@@ -312,7 +311,7 @@ io.on('connection', socket => {
 
 
         if (choice.option === 'stab') {
-            console.log(`${users[socket.id]} attempted to stab ${choice.target}.`);
+            console.log(`${users[socket.id]} attempted to stab ${users[choice.targetid]}.`);
             //TO DO: what happens in stabbing.
 
             var tempIndexVictim = gameInstance.participants.findIndex(player => player.usertag === choice.targetid);
@@ -320,18 +319,18 @@ io.on('connection', socket => {
             gameInstance.participants[tempIndexActor].knife(gameInstance.participants[tempIndexVictim]);
 
 
-            io.sockets.emit('game-event', `${users[socket.id]} attempted to stab ${choice.target}.`);
+            io.sockets.emit('game-event', `${users[socket.id]} attempted to stab ${users[choice.targetid]}.`);
         }
         if (choice.option === 'tape') {
-            console.log(`${users[socket.id]} investigated ${choice.target}.`);
+            console.log(`${users[socket.id]} investigated ${users[choice.targetid]}.`);
             //TO DO: what happens in taping.
 
             var tempIndexSuspect =  gameInstance.participants.findIndex(player => player.usertag === choice.targetid);
-            gameInstance.participants[tempIndexActor].suspect(gameInstance.participants[tempIndexSuspect]);
+            gameInstance.participants[tempIndexActor].tape(gameInstance.participants[tempIndexSuspect]);
 
 
 
-            io.sockets.emit('game-event', `${users[socket.id]} investigated ${choice.target}.`);
+            io.sockets.emit('game-event', `${users[socket.id]} investigated ${users[choice.targetid]}.`);
         }
         if (choice.option === 'awake') {
             
@@ -355,6 +354,7 @@ io.on('connection', socket => {
             console.log(`Everyone has chosen.`);
             io.sockets.emit('game-event', `Everyone has chosen.`);
             io.sockets.emit('phase', 1)
+            gameInstance.votesTotal = 0;
             gameInstance.startDay();
         }
 
