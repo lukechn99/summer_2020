@@ -186,7 +186,25 @@ class GameClient {
             }
         }
         console.log(ghostsPresent)
+    
+    // should we reveal who won on another page?
+    // we could call another page with the endPage() function
+    //  endPage(ghostsPresent)
     }
+
+    endPage(ghosts) {
+        var newWindow = window.open("/end.html", "_self");
+        if (ghosts == 0) {
+            newWindow.document.write("<p>Players escaped!</p>");
+        }
+        else {
+            $ghosts = ghosts.toString()
+            $ret = "The game ended with $ghosts ghosts left"
+            newWindow.document.write("<p>$ret</p>");
+        }
+        
+    }
+
 }
 
 
