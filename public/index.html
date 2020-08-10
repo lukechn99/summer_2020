@@ -66,7 +66,7 @@
             <div class='phase-0'>
             <input id="start" type="button" value="Start" onclick="socket.emit('start-game', null); toggle_visible(1);"></input>
             </div>
-            <div class="phase-1">
+            <div class='phase-1'>
                 <label>Day</label><br>
                 <input id="day-leave" type="button" onclick="button_day('leave');" value="Leave"></input>
                 <label>or</label>
@@ -237,6 +237,18 @@
         }
         socket.on('phase', phase => {
             toggle_visible(phase, debug_mode.checked)
+        })
+
+        socket.on('end', ghosts => {
+            var newWindow = window.open("/end.html", "_self");
+            if (ghosts == 0) {
+                newWindow.document.write("<p>Players escaped!</p>");
+            }
+            else {
+                $ghosts = ghosts.toString()
+                $ret = "The game ended with $ghosts ghosts left"
+                newWindow.document.write("<p>$ret</p>");
+            }
         })
     </script>
 </body>
