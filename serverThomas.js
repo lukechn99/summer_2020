@@ -125,7 +125,7 @@ class GameClient {
     	this.daysPassed++;
     	console.log(`Dawn of the ${this.daysPassed}'th day`);
     	io.sockets.emit('game-event', `Dawn of the ${this.daysPassed}'th day`);
-
+        let dead = [];
     		//runs through players, acting out what happened during the night.
     	for (var i = 0; i < this.participants.length; i++) {
         	var thisUser = this.participants[i];
@@ -134,8 +134,10 @@ class GameClient {
         	//kills user depending on how much sleep they got
         	if (thisUser.tiredDays != 0) {tolerance = 0};
         	if (thisUser.timesKnifed > tolerance) {
-            	this.killPlayer(thisUser.name);
-            	i--;
+                //add user to death list.
+                dead.push(this.participants[i].usertag);
+                console.log(`${thisUser.name} has been killed`);
+                io.sockets.emit('game-event', `${thisUser.name} has been killed`);
         	}
         	//tells player who chose tape whether their suspect left the room
         	else {
@@ -158,15 +160,19 @@ class GameClient {
             	    }
                 }
             }
+            //filter out all dead people from participants
+            this.participants = this.participants.filter(player => !(dead.includes(player.usertag)))
+
         	//reset night stats
         	thisUser.timesKnifed = 0;
         	thisUser.investigating = null;
         	thisUser.murderer = null;
         	thisUser.leavesRoom = false;
-    	}
+        }
+        
     }
     //removes players from list of participants
-    killPlayer(playerID) {
+    /*killPlayer(playerID) {
         for (var i = 0; i < this.participants.length; i++) {
             if (this.participants[i].usertag == playerID) {
                 console.log(this.participants[i].name + ' has been killed');
@@ -175,7 +181,7 @@ class GameClient {
         
             }
         }
-    }
+    }*/
     //checks whether ghosts are present and will tell player whether they won or not, this function is not finished.
     endGame() {
         var ghostsPresent = 0;
