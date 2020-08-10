@@ -228,6 +228,10 @@
                     element.style.display = phase_style;
                 }
             }
+            const chatframe_elements = document.getElementsByClassName('chatframe');
+            for (const element of chatframe_elements) {
+                element.style.display = (phase < 5 || debug && !spectator) ? "block" : "none";
+            }
             const color_arg = 128 * (1 - Math.cos(Math.PI * phase / 7))
             const red = Math.floor(175 * Math.exp(0 - ((color_arg - 80) / 100) ** 2));
             const green = Math.floor(200 * Math.exp(0 - ((color_arg - 30) / 100) ** 2));
