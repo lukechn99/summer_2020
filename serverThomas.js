@@ -168,8 +168,8 @@ class GameClient {
         }
         //filter out all dead people from participants
         this.participants = this.participants.filter(player => !(dead.includes(player.usertag)))
-        console.log(`surviving participants: ${this.participants.map(x => x.name).join()}`)
-        io.sockets.emit('game-event', `surviving participants: ${this.participants.map(x => x.name).join(', ')}`)
+        console.log(`Surviving participants: ${this.participants.map(x => x.name).join()}`)
+        io.sockets.emit('game-event', `Surviving participants: ${this.participants.map(x => x.name).join(', ')}`)
     }
     //removes players from list of participants
     /*killPlayer(playerID) {
