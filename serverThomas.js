@@ -123,8 +123,8 @@ class GameClient {
 
     startDay() {
     	this.daysPassed++;
-    	console.log(`Dawn of the ${this.daysPassed}'th day`);
-    	io.sockets.emit('game-event', `Dawn of the ${this.daysPassed}'th day`);
+        console.log(`===== Dawn of the ${this.daysPassed}'th day =====`);
+        io.sockets.emit('game-event', `===== Dawn of the ${this.daysPassed}'th day =====`);
         let dead = [];
     		//runs through players, acting out what happened during the night.
     	for (var i = 0; i < this.participants.length; i++) {
@@ -136,40 +136,40 @@ class GameClient {
         	if (thisUser.timesKnifed > tolerance) {
                 //add user to death list.
                 dead.push(this.participants[i].usertag);
-                console.log(`${thisUser.name} has been killed`);
-                io.sockets.emit('game-event', `${thisUser.name} has been killed`);
+                console.log(`${thisUser.name} has been killed.`);
+                io.sockets.emit('game-event', `${thisUser.name} has been killed.`);
         	}
         	//tells player who chose tape whether their suspect left the room
         	else {
                 if (thisUser.investigating != null) {
             	    if (thisUser.investigating.leavesRoom){
-                	    console.log(`${thisUser.name} saw ${thisUser.investigating.name} leave the room`);
-                	    io.sockets.emit('game-event', `${thisUser.name} saw ${thisUser.investigating.name} leave the room`);
+                	    console.log(`${thisUser.name} saw ${thisUser.investigating.name} leave the room.`);
+                	    io.sockets.emit('game-event', `${thisUser.name} saw ${thisUser.investigating.name} leave the room.`);
             	    }
             	    else {
-                	console.log(`${thisUser.name} didn't see ${thisUser.investigating.name} leave the room`);
-                	io.sockets.emit('game-event', `${thisUser.name} didn't see ${thisUser.investigating.name} leave the room`);
+                	console.log(`${thisUser.name} didn't see ${thisUser.investigating.name} leave the room.`);
+                	io.sockets.emit('game-event', `${thisUser.name} didn't see ${thisUser.investigating.name} leave the room.`);
             	    }
             
                 }
         	//tells the people who stayed up who tried to kill them
         	    else {
             	    if (thisUser.murderer != null) {
-            	        console.log(`${thisUser.name} saw ${thisUser.murderer.name} try to kill them`);
-            	        io.sockets.emit('game-event', `${thisUser.name} saw ${thisUser.murderer.name} try to kill them`);
+            	        console.log(`${thisUser.name} saw ${thisUser.murderer.name} try to kill them.`);
+            	        io.sockets.emit('game-event', `${thisUser.name} saw ${thisUser.murderer.name} try to kill them.`);
             	    }
                 }
             }
-            //filter out all dead people from participants
-            this.participants = this.participants.filter(player => !(dead.includes(player.usertag)))
-
         	//reset night stats
         	thisUser.timesKnifed = 0;
         	thisUser.investigating = null;
         	thisUser.murderer = null;
         	thisUser.leavesRoom = false;
         }
-        
+        //filter out all dead people from participants
+        this.participants = this.participants.filter(player => !(dead.includes(player.usertag)))
+        console.log(`surviving participants: ${this.participants.map(x => x.name).join()}`)
+        io.sockets.emit('game-event', `surviving participants: ${this.participants.map(x => x.name).join(', ')}`)
     }
     //removes players from list of participants
     /*killPlayer(playerID) {
@@ -184,32 +184,19 @@ class GameClient {
     }*/
     //checks whether ghosts are present and will tell player whether they won or not, this function is not finished.
     endGame() {
+        /*
         var ghostsPresent = 0;
 
-        for (var i = 0; i < participants.length; i++) {
-            if (participants[i].isGhost == true) {
+        for (var i = 0; i < this.participants.length; i++) {
+            if (this.participants[i].isGhost == true) {
                 ghostsPresent++;
             }
-        }
-        console.log(ghostsPresent)
-    
-    // should we reveal who won on another page?
-    // we could call another page with the endPage() function
-    //  endPage(ghostsPresent)
+        }*/
+        const ghostsPresent = this.participants.reduce((ghosts, participant) => ghosts + participant.isGhost, 0)
+
+        console.log(`The game ended with ${ghostsPresent} ghosts left.`)
+        io.sockets.emit('end', ghostsPresent)
     }
-
-    // endPage(ghosts) {
-    //     var newWindow = window.open("/end.html", "_self");
-    //     if (ghosts == 0) {
-    //         newWindow.document.write("<p>Players escaped!</p>");
-    //     }
-    //     else {
-    //         $ghosts = ghosts.toString()
-    //         $ret = "The game ended with $ghosts ghosts left"
-    //         newWindow.document.write("<p>$ret</p>");
-    //     }
-    // }
-
 }
 
 
