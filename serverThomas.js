@@ -268,6 +268,7 @@ io.on('connection', socket => {
     //option = 'stay' or 'leave'
 
     socket.on('button-day', option => {
+        socket.emit('phase', 2);
         console.log(`${users[socket.id]} voted to ${option}.`);
         io.sockets.emit('game-event', `${users[socket.id]} voted to ${option}.`);
 
@@ -291,6 +292,7 @@ io.on('connection', socket => {
 
     
     socket.on('button-proceed', () => {
+        socket.emit('phase', 4);
         console.log(`${users[socket.id]} wants to proceed to night.`);
         io.sockets.emit('game-event', `${users[socket.id]} wants to proceed to night.`);
         voteForNight++;
@@ -321,6 +323,7 @@ io.on('connection', socket => {
 
 
         if (choice.option === 'stab') {
+            socket.emit('phase', 6);
             console.log(`${users[socket.id]} attempted to stab ${users[choice.targetid]}.`);
             //TO DO: what happens in stabbing.
 
@@ -332,6 +335,7 @@ io.on('connection', socket => {
             io.sockets.emit('game-event', `${users[socket.id]} attempted to stab ${users[choice.targetid]}.`);
         }
         if (choice.option === 'tape') {
+            socket.emit('phase', 6);
             console.log(`${users[socket.id]} investigated ${users[choice.targetid]}.`);
             //TO DO: what happens in taping.
 
@@ -345,11 +349,10 @@ io.on('connection', socket => {
         if (choice.option === 'awake') {
             
             //TO DO: what happens in staying awake.
-
             if (gameInstance.participants[tempIndexActor].awake()) {
+                socket.emit('phase', 6);
                 console.log(`${users[socket.id]} is staying awake.`);
                 io.sockets.emit('game-event', `${users[socket.id]} is staying awake.`);
-                socket.emit('phase', 6)
             }
             else {
                 gameInstance.votesTotal--;
