@@ -100,7 +100,11 @@ class GameClient {
     constructor(participantIDs) {
         this.daysPassed = 0;
         this.participants = [];
+        //keeping as singular values now, will make lists when implement repossession.
+        this.ghostOne = null;
+        this.ghostTwo = null;
         this.votesTotal = 0;
+        this.gameActive = true;
         console.log(participantIDs);
         //choosing who the ghosts are
         var randomElement = Math.floor(Math.random() * participantIDs.length);
@@ -118,6 +122,10 @@ class GameClient {
             var newPlayer = new Player(participantIDs[i], playerIsGhost);
             this.participants.push(newPlayer);
         }
+
+        this.ghostOne = this.participants[randomElement];
+        this.ghostTwo = this.participants[randomElement2];
+
         console.log(this.participants);
     }
 
@@ -138,6 +146,8 @@ class GameClient {
                 dead.push(this.participants[i].usertag);
                 console.log(`${thisUser.name} has been killed.`);
                 io.sockets.emit('game-event', `${thisUser.name} has been killed.`);
+                //makes the user a spectator.
+                io.to(thisUser.usertag).emit('trigger-spectator',null);
         	}
         	//tells player who chose tape whether their suspect left the room
         	else {
@@ -166,6 +176,23 @@ class GameClient {
         	thisUser.murderer = null;
         	thisUser.leavesRoom = false;
         }
+
+        if(dead.includes(this.ghostOne)){
+        	io.to(this.ghostTwo.usertag).emit('game-event', `The other ghost has been released from ${this.ghostOne}`);
+        }
+        else{
+        	io.to(this.ghostTwo.usertag).emit('game-event', `The other ghost still possesses ${this.ghostOne}`);
+        }
+
+        if(dead.includes(this.ghostTwo)){
+        	io.to(this.ghostOne.usertag).emit('game-event', `The other ghost has been released from ${this.ghostTwo}`);
+        }
+        else{
+        	io.to(this.ghostOne.usertag).emit('game-event', `The other ghost still possesses ${this.ghostTwo}`);
+        }
+
+
+
         //filter out all dead people from participants
         this.participants = this.participants.filter(player => !(dead.includes(player.usertag)))
         console.log(`Surviving participants: ${this.participants.map(x => x.name).join()}`)
@@ -196,6 +223,7 @@ class GameClient {
 
         console.log(`The game ended with ${ghostsPresent} ghosts left.`)
         io.sockets.emit('end', ghostsPresent)
+        this.gameActive = false;
     }
 }
 
@@ -247,6 +275,12 @@ io.on('connection', socket => {
         console.log(`${name} joined.`);
         socket.broadcast.emit('user-connected', name);
         io.sockets.emit('participants', users);
+
+        // turns user into a spectator if there is there is an active game.
+        if(gameInstance != null && gameInstance.gameActive){
+        	socket.emit('trigger-spectator', null);
+        }
+
     })
     
     //when server receives message, send chat message to all clients
