@@ -143,7 +143,7 @@ class GameClient {
         	if (thisUser.tiredDays != 0) {tolerance = 0};
         	if (thisUser.timesKnifed > tolerance) {
                 //add user to death list.
-                dead.push(this.participants[i].usertag);
+                dead.push(thisUser.usertag);
                 console.log(`${thisUser.name} has been killed.`);
                 io.sockets.emit('game-event', `${thisUser.name} has been killed.`);
                 //makes the user a spectator.
@@ -177,18 +177,18 @@ class GameClient {
         	thisUser.leavesRoom = false;
         }
 
-        if(dead.includes(this.ghostOne)){
-        	io.to(this.ghostTwo.usertag).emit('game-event', `The other ghost has been released from ${this.ghostOne}`);
+        if (dead.includes(this.ghostOne.usertag)) {
+        	io.to(this.ghostTwo.usertag).emit('game-event', `The other ghost has been released from ${this.ghostOne.name}`);
         }
-        else{
-        	io.to(this.ghostTwo.usertag).emit('game-event', `The other ghost still possesses ${this.ghostOne}`);
+        else {
+        	io.to(this.ghostTwo.usertag).emit('game-event', `The other ghost still possesses ${this.ghostOne.name}`);
         }
 
-        if(dead.includes(this.ghostTwo)){
-        	io.to(this.ghostOne.usertag).emit('game-event', `The other ghost has been released from ${this.ghostTwo}`);
+        if (dead.includes(this.ghostTwo.usertag)) {
+        	io.to(this.ghostOne.usertag).emit('game-event', `The other ghost has been released from ${this.ghostTwo.name}`);
         }
-        else{
-        	io.to(this.ghostOne.usertag).emit('game-event', `The other ghost still possesses ${this.ghostTwo}`);
+        else {
+        	io.to(this.ghostOne.usertag).emit('game-event', `The other ghost still possesses ${this.ghostTwo.name}`);
         }
 
 
@@ -277,7 +277,7 @@ io.on('connection', socket => {
         io.sockets.emit('participants', users);
 
         // turns user into a spectator if there is there is an active game.
-        if(gameInstance != null && gameInstance.gameActive){
+        if (gameInstance != null && gameInstance.gameActive) {
         	socket.emit('trigger-spectator', null);
         }
 
