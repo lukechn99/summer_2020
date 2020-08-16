@@ -95,14 +95,14 @@
             </div>
         </div>
         <div class="chatframe">
-            <form>
-                <label>Participants</label><br>
-                <textarea id="participants" disabled></textarea><br>
-                <label>Chat</label><br>
-                <textarea id="chatbox" disabled></textarea><br>
+            <label>Participants</label><br>
+            <textarea id="participants" disabled></textarea><br>
+            <label>Chat</label><br>
+            <textarea id="chatbox" disabled></textarea><br>
+            <div id="chatinput">
                 <input type="text" id="text"></input>
                 <input id="returnbutton" type="button" value="Return"></input><br>
-            </form>
+            </div>
         </div>
     </div>
     <input type="checkbox" id='debug-mode'></input><label>debug mode</label>
@@ -131,6 +131,7 @@
         const participantsbox = document.getElementById('participants');
         const playerselect = document.getElementById('player-select');
         const eventlog = document.getElementById('eventlog');
+        let currentphase = 0
         const debug_mode = document.getElementById('debug-mode');
         let spectator_mode = false;
 
@@ -180,8 +181,6 @@
             participantsbox.value = Object.values(users).join('\n');
         })
 
-        
-
         //triggered on clicking "Leave" or "Stay" buttons.
         function button_day(option = 'stay') {
             socket.emit('button-day', option);
@@ -225,10 +224,9 @@
                     element.style.display = phase_style;
                 }
             }
-            const chatframe_elements = document.getElementsByClassName('chatframe');
-            for (const element of chatframe_elements) {
-                element.style.display = (phase < 5 && !spectator || debug) ? "block" : "none";
-            }
+            chatbox.style.display = (phase < 5 || debug) ? "block" : "none";
+            document.getElementById("chatinput").style.display = (phase < 5 && !spectator || debug) ? "block" : "none";
+
             const color_arg = 128 * (1 - Math.cos(Math.PI * phase / 7))
             const red = Math.floor(175 * Math.exp(0 - ((color_arg - 80) / 100) ** 2));
             const green = Math.floor(200 * Math.exp(0 - ((color_arg - 30) / 100) ** 2));
@@ -238,16 +236,17 @@
         }
 
         socket.on('phase', phase => {
+            currentphase = phase
             toggle_visible(phase, debug_mode.checked, spectator_mode)
         })
 
-        socket.on('trigger-spectator', phase => {
+        socket.on('trigger-spectator', () => {
             spectator_mode = true;
-            toggle_visible(phase, debug_mode.checked, spectator_mode);
+            toggle_visible(currentphase, debug_mode.checked, spectator_mode);
         })
 
         socket.on('end', ghosts => {
-            var newWindow = window.open("/end.html", "_self");
+            let newWindow = window.open("/end.html", "_self");
             if (ghosts == 0) {
                 newWindow.document.write("<p>Players escaped!</p>");
             }
