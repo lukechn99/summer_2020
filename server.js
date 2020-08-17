@@ -30,8 +30,7 @@ class Player{
         	this.tiredDays++;
         	return true;
         }
-}
-
+    }
 }
 
 class GameClient {
@@ -136,7 +135,7 @@ class GameClient {
         console.log(`Surviving participants: ${this.participants.map(x => x.name).join()}`)
         io.sockets.emit('game-event', `Surviving participants: ${this.participants.map(x => x.name).join(', ')}`)
     }
-        
+
     //checks whether ghosts are present and will tell player whether they won or not, this function is not finished.
     endGame() {
         /*
