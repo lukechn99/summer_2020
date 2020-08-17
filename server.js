@@ -214,16 +214,17 @@ io.on('connection', socket => {
         users[socket.id] = {name: name, isPlaying: true};
         console.log(`${name} joined.`);
         socket.broadcast.emit('user-connected', name);
-        io.sockets.emit('participants', users);
 
         // turns user into a spectator if there is there is an active game.
         if (gameInstance != null && gameInstance.gameActive) {
             socket.emit('trigger-spectator', null);
             users[socket.id].isPlaying = false
         }
+        io.sockets.emit('participants', users);
     })
     socket.on('update-spectator', bool => {
-        users[socket.id].isPlaying = bool
+        users[socket.id].isPlaying = bool;
+        io.sockets.emit('participants', users);
     })
 
     //when server receives message, send chat message to all clients
@@ -284,10 +285,6 @@ io.on('connection', socket => {
             io.sockets.emit('game-event', `Proceed to night.`);
             io.sockets.emit('phase', 5)
         }
-
-
-
-        
     })
 
     //Night Phase
@@ -335,10 +332,7 @@ io.on('connection', socket => {
                 gameInstance.votesTotal--;
                 console.log(`${users[socket.id].name} is too tired, pick another option.`);
                 io.sockets.emit('game-event', `${users[socket.id].name} is too tired, pick another option.`);
-            }
-
-
-            
+            }    
         }
         if (gameInstance.votesTotal >= gameInstance.participants.length) {
             console.log(`Everyone has chosen.`);

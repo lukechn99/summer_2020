@@ -243,12 +243,13 @@
         }
 
         socket.on('phase', phase => {
-            currentphase = phase
-            toggle_visible(phase, debug_mode.checked, spectator_mode.checked)
+            currentphase = phase;
+            toggle_visible(phase, debug_mode.checked, spectator_mode.checked);
         })
 
         spectator_mode.addEventListener('click', event => {
-            socket.emit('update-spectator', spectator_mode.checked)
+            socket.emit('update-spectator', spectator_mode.checked);
+            toggle_visible(currentphase, debug_mode.checked, spectator_mode.checked);
         })
 
         socket.on('trigger-spectator', () => {
