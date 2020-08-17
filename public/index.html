@@ -65,7 +65,7 @@
             <br>
             <div class='phase-0'>
             <input id="start" type="button" value="Start" onclick="socket.emit('start-game', null); toggle_visible(1);"></input>
-            <input type="checkbox" id='spectator'></input><label>join as spectator</label>
+            <input type="checkbox" id='spectator-mode'></input><label>join as spectator</label>
             </div>
             <div class='phase-1'>
                 <label>Day</label><br>
@@ -134,7 +134,7 @@
         const eventlog = document.getElementById('eventlog');
         let currentphase = 0
         const debug_mode = document.getElementById('debug-mode');
-        let spectator_mode = false;
+        const spectator_mode = document.getElementById('spectator-mode');
 
         //socket client programming
         let name;
@@ -238,12 +238,12 @@
 
         socket.on('phase', phase => {
             currentphase = phase
-            toggle_visible(phase, debug_mode.checked, spectator_mode)
+            toggle_visible(phase, debug_mode.checked, spectator_mode.checked)
         })
 
         socket.on('trigger-spectator', () => {
-            spectator_mode = true;
-            toggle_visible(currentphase, debug_mode.checked, spectator_mode);
+            spectator_mode.checked = true;
+            toggle_visible(currentphase, debug_mode.checked, spectator_mode.checked);
         })
 
         socket.on('end', ghosts => {
