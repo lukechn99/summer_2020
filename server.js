@@ -63,6 +63,11 @@ class GameClient {
         this.ghostOne = this.participants[randomElement];
         this.ghostTwo = this.participants[randomElement2];
 
+        io.to(this.ghostTwo.usertag).emit('game-event', `You and ${this.ghostOne.name} have been possessed`);
+        io.to(this.ghostOne.usertag).emit('game-event', `You and ${this.ghostTwo.name} have been possessed`);
+
+
+
         console.log(this.participants);
     }
 
