@@ -89,7 +89,8 @@ class GameClient {
                 console.log(`${thisUser.name} has been killed.`);
                 io.sockets.emit('game-event', `${thisUser.name} has been killed.`);
                 //makes the user a spectator.
-                io.to(thisUser.usertag).emit('trigger-spectator',null);
+                io.to(thisUser.usertag).emit('trigger-spectator', null);
+                users[thisUser.usertag].isPlaying = false;
         	}
         	//tells player who chose tape whether their suspect left the room
         	else {
@@ -139,6 +140,7 @@ class GameClient {
         this.participants = this.participants.filter(player => !(dead.includes(player.usertag)))
         console.log(`Surviving participants: ${this.participants.map(x => x.name).join()}`)
         io.sockets.emit('game-event', `Surviving participants: ${this.participants.map(x => x.name).join(', ')}`)
+        io.sockets.emit('participants', users);
     }
 
     //checks whether ghosts are present and will tell player whether they won or not, this function is not finished.
@@ -195,36 +197,45 @@ io.on('connection', socket => {
     // when start button is pressed, initialize game client
     socket.on('start-game', () => {
 		console.log("Game Start");
-		io.sockets.emit('game-event', "Game Start");
-        gameInstance = new GameClient(Object.keys(users));
+        io.sockets.emit('game-event', "Game Start");
+        let participants = []
+        for (const id of users) {
+            if (users[id].isPlaying) {
+                participants.push(id)
+            }
+        }
+        gameInstance = new GameClient(participants);
         io.sockets.emit('phase', 1);
         unanimous = true;
 	})
     
     //when username is entered, track name in users, send user-connected message to all clients, update participants box
     socket.on('new-user', name => {
-        users[socket.id] = name;
+        users[socket.id] = {name: name, isPlaying: true};
         console.log(`${name} joined.`);
         socket.broadcast.emit('user-connected', name);
         io.sockets.emit('participants', users);
 
         // turns user into a spectator if there is there is an active game.
         if (gameInstance != null && gameInstance.gameActive) {
-        	socket.emit('trigger-spectator', null);
+            socket.emit('trigger-spectator', null);
+            users[socket.id].isPlaying = false
         }
-
     })
-    
+    socket.on('update-spectator', bool => {
+        users[socket.id].isPlaying = bool
+    })
+
     //when server receives message, send chat message to all clients
     socket.on('send-chat-message', message => {
-        console.log(`message from ${users[socket.id]}: ${message}`);
-        socket.broadcast.emit('chat-message', {message: message, name: users[socket.id]});
+        console.log(`message from ${users[socket.id].name}: ${message}`);
+        socket.broadcast.emit('chat-message', {message: message, name: users[socket.id].name});
     })
     
     //when client disconnects, send user-disconnect message to all clients, update participants box
     socket.on('disconnect', () => {
-        socket.broadcast.emit('user-disconnected', users[socket.id]);
-        console.log(`${users[socket.id]} left.`);
+        socket.broadcast.emit('user-disconnected', users[socket.id].name);
+        console.log(`${users[socket.id].name} left.`);
         delete users[socket.id];
         io.sockets.emit('participants', users);
     })
@@ -235,8 +246,8 @@ io.on('connection', socket => {
 
     socket.on('button-day', option => {
         socket.emit('phase', 2);
-        console.log(`${users[socket.id]} voted to ${option}.`);
-        io.sockets.emit('game-event', `${users[socket.id]} voted to ${option}.`);
+        console.log(`${users[socket.id].name} voted to ${option}.`);
+        io.sockets.emit('game-event', `${users[socket.id].name} voted to ${option}.`);
 
         //TO DO: what happens when vote stay or leave.
         gameInstance.votesTotal++;
@@ -259,8 +270,8 @@ io.on('connection', socket => {
     
     socket.on('button-proceed', () => {
         socket.emit('phase', 4);
-        console.log(`${users[socket.id]} wants to proceed to night.`);
-        io.sockets.emit('game-event', `${users[socket.id]} wants to proceed to night.`);
+        console.log(`${users[socket.id].name} wants to proceed to night.`);
+        io.sockets.emit('game-event', `${users[socket.id].name} wants to proceed to night.`);
         voteForNight++;
         var majority = Math.floor(gameInstance.participants.length / 2);
         //TO DO: what happens when vote to proceed.
@@ -290,7 +301,7 @@ io.on('connection', socket => {
 
         if (choice.option === 'stab') {
             socket.emit('phase', 6);
-            console.log(`${users[socket.id]} attempted to stab ${users[choice.targetid]}.`);
+            console.log(`${users[socket.id].name} attempted to stab ${users[choice.targetid]}.`);
             //TO DO: what happens in stabbing.
 
             var tempIndexVictim = gameInstance.participants.findIndex(player => player.usertag === choice.targetid);
@@ -298,11 +309,11 @@ io.on('connection', socket => {
             gameInstance.participants[tempIndexActor].knife(gameInstance.participants[tempIndexVictim]);
 
 
-            io.sockets.emit('game-event', `${users[socket.id]} attempted to stab ${users[choice.targetid]}.`);
+            io.sockets.emit('game-event', `${users[socket.id].name} attempted to stab ${users[choice.targetid]}.`);
         }
         if (choice.option === 'tape') {
             socket.emit('phase', 6);
-            console.log(`${users[socket.id]} investigated ${users[choice.targetid]}.`);
+            console.log(`${users[socket.id].name} investigated ${users[choice.targetid]}.`);
             //TO DO: what happens in taping.
 
             var tempIndexSuspect =  gameInstance.participants.findIndex(player => player.usertag === choice.targetid);
@@ -310,20 +321,20 @@ io.on('connection', socket => {
 
 
 
-            io.sockets.emit('game-event', `${users[socket.id]} investigated ${users[choice.targetid]}.`);
+            io.sockets.emit('game-event', `${users[socket.id].name} investigated ${users[choice.targetid]}.`);
         }
         if (choice.option === 'awake') {
             
             //TO DO: what happens in staying awake.
             if (gameInstance.participants[tempIndexActor].awake()) {
                 socket.emit('phase', 6);
-                console.log(`${users[socket.id]} is staying awake.`);
-                io.sockets.emit('game-event', `${users[socket.id]} is staying awake.`);
+                console.log(`${users[socket.id].name} is staying awake.`);
+                io.sockets.emit('game-event', `${users[socket.id].name} is staying awake.`);
             }
             else {
                 gameInstance.votesTotal--;
-                console.log(`${users[socket.id]} is too tired, pick another option.`);
-                io.sockets.emit('game-event', `${users[socket.id]} is too tired, pick another option.`);
+                console.log(`${users[socket.id].name} is too tired, pick another option.`);
+                io.sockets.emit('game-event', `${users[socket.id].name} is too tired, pick another option.`);
             }
 
 

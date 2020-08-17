@@ -175,11 +175,17 @@
         //update participansbox and playerselect
         socket.on('participants', users => {
             let str = '';
+            let participantsstr = ''
             for (const id in users) {
-                str += `<option value='${id}'>${users[id]}</option>`;
+                participantsstr += users[id].name;
+                if (users[id].isPlaying) {
+                    str += `<option value='${id}'>${users[id].name}</option>`;
+                    participantsstr += ' (playing)';
+                }
+                participantsstr += '\n';
             }
             playerselect.innerHTML = str;
-            participantsbox.value = Object.values(users).join('\n');
+            participantsbox.value = participantsstr;
         })
 
         //triggered on clicking "Leave" or "Stay" buttons.
@@ -239,6 +245,10 @@
         socket.on('phase', phase => {
             currentphase = phase
             toggle_visible(phase, debug_mode.checked, spectator_mode.checked)
+        })
+
+        spectator_mode.addEventListener('click', event => {
+            socket.emit('update-spectator', spectator_mode.checked)
         })
 
         socket.on('trigger-spectator', () => {
