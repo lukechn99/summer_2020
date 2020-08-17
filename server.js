@@ -1,17 +1,3 @@
-//game code goes here
-
-//Player object, keeps track of stats that change throughout the day
-/*function Player(name, isGhost){
-    this.name = name;
-    this.isGhost = isGhost;
-    this.isDead = false;
-    this.timesKnifed = 0;
-    this.tiredDays = 0;
-    this.leavesRoom = false;
-    this.investigating = null;
-    this.murderers = null;
-} */
-
 class Player{
 	constructor(ID, isGhost){
 		this.usertag = ID;
@@ -48,54 +34,6 @@ class Player{
 
 }
 
-
-
-//just checks whether the player can sleep or not depending on how many days they stayed awake in a row.
-
-
-/*function startDay(){
-    this.daysPassed++;
-    console.log(`Dawn of the ${this.daysPassed}'th day`);
-    socket.broadcast.emit('chat-message', `Dawn of the ${this.daysPassed}'th day`);
-
-    //runs through players, acting out what happened during the night.
-    for(var i = 0; i < this.participants.length; i++){
-        var thisUser = this.participants[i];
-        var tolerance = 1;
-
-        //kills user depending on how much sleep they got
-        if(thisUser.tiredDays != 0) tolerance = 0;
-        if(thisUser.timesKnifed > tolerance){
-            this.killPlayer(thisUser.name);
-            i--;
-        }
-        //tells player who chose tape whether their suspect left the room
-        else if(thisUser.investigating != null){
-            if(thisUser.investigating.leavesRoom){
-                console.log(`${thisUser.name} saw ${thisUser.investigating.name} leave the room`);
-                socket.broadcast.emit('chat-message', `${thisUser.name} saw ${thisUser.investigating.name} leave the room`);
-            }
-            else{
-                console.log(`${thisUser.name} didn't see ${thisUser.investigating.name} leave the room`);
-                socket.broadcast.emit('chat-message', `${thisUser.name} didn't see ${thisUser.investigating.name} leave the room`);
-            }
-            
-        }
-        //tells the people who stayed up who tried to kill them
-        else{
-            if(thisUser.murderer != null){
-                console.log(`${thisUser.name} saw ${thisUser.murderer.name} try to kill them`);
-                socket.broadcast.emit('chat-message', `${thisUser.name} saw ${thisUser.murderer.name} try to kill them`);
-            }
-        }
-
-        thisUser.timesKnifed = 0;
-        thisUser.investigating = null;
-        thisUser.murderer = null;
-        thisUser.leavesRoom = false;
-
-    }
-} */
 class GameClient {
     constructor(participantIDs) {
         this.daysPassed = 0;
@@ -198,17 +136,7 @@ class GameClient {
         console.log(`Surviving participants: ${this.participants.map(x => x.name).join()}`)
         io.sockets.emit('game-event', `Surviving participants: ${this.participants.map(x => x.name).join(', ')}`)
     }
-    //removes players from list of participants
-    /*killPlayer(playerID) {
-        for (var i = 0; i < this.participants.length; i++) {
-            if (this.participants[i].usertag == playerID) {
-                console.log(this.participants[i].name + ' has been killed');
-                io.sockets.emit('game-event', this.participants[i].name + ' has been killed');
-                participants.splice(i,1);
         
-            }
-        }
-    }*/
     //checks whether ghosts are present and will tell player whether they won or not, this function is not finished.
     endGame() {
         /*
