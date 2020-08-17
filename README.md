@@ -5,7 +5,12 @@ https://docs.google.com/document/d/1wmxIVC2qE-FJ6cfsiY5HSu9gsvDUF_meoxXCuo7gLz0/
 ## TODO:  
 - ~Assign S3 full access for code~
 - ~create s3 bucket~
-- 
+- Add functionality for Ghosts to repossess people
+- Add a win screen at the end of the game
+	-Determine which players reach the win screen.
+	-Button on screen which resets spectator status and lets players start a new game
+- Add a button before the game starts to become spectator instead of player
+- Revise staying awake
 
 ## Notes:  
 - `ssh ec2-user@18.217.107.58 -i practice_instance.pem` from the cloned project folder to ssh into the EC2 instance
