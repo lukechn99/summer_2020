@@ -64,7 +64,7 @@
             <textarea id="eventlog" disabled></textarea>
             <br>
             <div class='phase-0'>
-            <input id="start" type="button" value="Start" onclick="socket.emit('start-game', null); toggle_visible(1);"></input>
+            <input id="start" type="button" value="Start" onclick="socket.emit('start-game', null);"></input>
             <input type="checkbox" id='spectator-mode'></input><label>join as spectator</label>
             </div>
             <div class='phase-1'>
@@ -132,7 +132,6 @@
         const participantsbox = document.getElementById('participants');
         const playerselect = document.getElementById('player-select');
         const eventlog = document.getElementById('eventlog');
-        let currentphase = 0
         const debug_mode = document.getElementById('debug-mode');
         const spectator_mode = document.getElementById('spectator-mode');
 
@@ -243,18 +242,16 @@
         }
 
         socket.on('phase', phase => {
-            currentphase = phase;
             toggle_visible(phase, debug_mode.checked, spectator_mode.checked);
         })
 
         spectator_mode.addEventListener('click', event => {
             socket.emit('update-spectator', spectator_mode.checked);
-            toggle_visible(currentphase, debug_mode.checked, spectator_mode.checked);
         })
 
-        socket.on('trigger-spectator', () => {
-            spectator_mode.checked = true;
-            toggle_visible(currentphase, debug_mode.checked, spectator_mode.checked);
+        socket.on('trigger-spectator', option => {
+            spectator_mode.checked = option.isSpectator;
+            toggle_visible(option.phase, debug_mode.checked, spectator_mode.checked);
         })
 
         socket.on('end', ghosts => {
