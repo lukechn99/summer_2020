@@ -9,16 +9,20 @@ class Player{
     	this.leavesRoom = false;
     	this.investigating = null;
     	this.murderers = null;
+    	this.stayedAwake = false;
+    	this.possessedBy = null;
 	}
 	//increases the counter of stabs on victim, and shows the murderer left the room. If the victim is awake, they see the murderer
 	knife(victim) {
 		victim.timesKnifed++;
+		stayedAwake = false;
 		this.leavesRoom = true;
 		this.tiredDays = 0;
 		victim.murderers = this;
 	}
 	//tape lets player investigate, info will be revealed at the start of the next day.
 	tape(suspect) {
+		stayedAwake = false;
     	this.investigating = suspect;
     	this.tiredDays = 0;
 	}
@@ -28,8 +32,16 @@ class Player{
     	}
     	else {
         	this.tiredDays++;
+        	stayedAwake = true;
         	return true;
         }
+    }
+    possessed(pastHost){ //The function called to get possessed, easier to code this way since players are deleted at the start of each day.
+        if(isGhost){
+            return false;
+        }
+        newHost.isGhost = true;
+        newHost.possessedBy = pastHost;
     }
 }
 
@@ -82,7 +94,7 @@ class GameClient {
         	var tolerance = 1;
 
         	//kills user depending on how much sleep they got
-        	if (thisUser.tiredDays != 0) {tolerance = 0};
+        	if (thisUser.tiredDays > 1 && !thisUser.stayedAwake) {tolerance = 0};
         	if (thisUser.timesKnifed > tolerance) {
                 //add user to death list.
                 this.dead.push(thisUser.usertag);
@@ -100,8 +112,8 @@ class GameClient {
                 	    io.sockets.emit('game-event', `${thisUser.name} saw ${thisUser.investigating.name} leave the room.`);
             	    }
             	    else {
-                	console.log(`${thisUser.name} didn't see ${thisUser.investigating.name} leave the room.`);
-                	io.sockets.emit('game-event', `${thisUser.name} didn't see ${thisUser.investigating.name} leave the room.`);
+                		console.log(`${thisUser.name} didn't see ${thisUser.investigating.name} leave the room.`);
+                		io.sockets.emit('game-event', `${thisUser.name} didn't see ${thisUser.investigating.name} leave the room.`);
             	    }
             
                 }
@@ -119,9 +131,10 @@ class GameClient {
         	thisUser.murderer = null;
         	thisUser.leavesRoom = false;
         }
-
+        //Handles what occurs if a ghost dies
         if (this.dead.includes(this.ghostOne.usertag)) {
         	io.to(this.ghostTwo.usertag).emit('game-event', `The other ghost has been released from ${this.ghostOne.name}`);
+        	io.to(this.ghostOne.usertag).emit('game-event', `Please choose a new host to possess once night falls`);
         }
         else {
         	io.to(this.ghostTwo.usertag).emit('game-event', `The other ghost still possesses ${this.ghostOne.name}`);
@@ -129,6 +142,7 @@ class GameClient {
 
         if (this.dead.includes(this.ghostTwo.usertag)) {
         	io.to(this.ghostOne.usertag).emit('game-event', `The other ghost has been released from ${this.ghostTwo.name}`);
+        	io.to(this.ghostTwo.usertag).emit('game-event', `Please choose a new host to possess once night falls`);
         }
         else {
         	io.to(this.ghostOne.usertag).emit('game-event', `The other ghost still possesses ${this.ghostTwo.name}`);
