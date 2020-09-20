@@ -228,7 +228,7 @@ io.on('connection', socket => {
     socket.on('new-user', name => {
         users[socket.id] = {name: name, isPlaying: true};
         if (name == null) {
-            name = "Anonymous";
+            name == "Anonymous"
         }
         console.log(`${name} joined.`);
         socket.broadcast.emit('user-connected', name);
