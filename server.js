@@ -56,6 +56,7 @@ class GameClient {
         this.votesTotal = 0;
         this.gameActive = true;
         console.log(participantIDs);
+
         //choosing who the ghosts are
         var randomElement = Math.floor(Math.random() * participantIDs.length);
         var randomElement2 = Math.floor(Math.random() * participantIDs.length);
@@ -226,6 +227,9 @@ io.on('connection', socket => {
     //when username is entered, track name in users, send user-connected message to all clients, update participants box
     socket.on('new-user', name => {
         users[socket.id] = {name: name, isPlaying: true};
+        if (name == null) {
+            name = "Anonymous";
+        }
         console.log(`${name} joined.`);
         socket.broadcast.emit('user-connected', name);
 
